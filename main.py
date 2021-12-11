@@ -25,15 +25,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_percentage_error
 
-mape_lst = []
+@st.cache
+def mape_list_func():
+    mape_lst = []
+    for train_size in range(1, 10):
+        train_size = train_size / 10
+        train_x, test_x, train_y, test_y = train_test_split(x, y, random_state=1, train_size=train_size)
+        m = LinearRegression()
+        m.fit(train_x, train_y)
+        p = m.predict(test_x)
+        mape = mean_absolute_percentage_error(p, test_y)
+        mape_lst.append(mape)
+    return mape_lst
 
-for train_size in range(1, 10):
-    train_size = train_size / 10
-    train_x, test_x, train_y, test_y = train_test_split(x, y, train_size=train_size)
-    m = LinearRegression()
-    m.fit(train_x, train_y)
-    p = m.predict(test_x)
-    mape = mean_absolute_percentage_error(p, test_y)
-    mape_lst.append(mape)
+mape_lst = mape_list_func()
 
 st.write(mape_lst)
