@@ -1,3 +1,4 @@
+from matplotlib.pyplot import sca
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -48,6 +49,13 @@ mape_df = pd.DataFrame(
     }
 )
 
+avg = sum(mape_df["mape"]) / len(mape_df["mape"])
+avg_df = pd.DataFrame(
+    {
+        'y': [avg]
+    }
+)
+
 chart_style = st.selectbox("Chart type", ("Matplotlib", "Vega"))
 
 if chart_style == "Matplotlib":
@@ -55,7 +63,6 @@ if chart_style == "Matplotlib":
     bar = st.checkbox("Bar chart")
     if bar:
         plt.bar(mape_df["train_size"], mape_df["mape"], width=7)
-        avg = sum(mape_df["mape"]) / len(mape_df["mape"])
         plt.plot([0, 100], [avg, avg], color="red")
         plt.ylim([0, 1])
         plt.legend(loc="upper right")
@@ -74,13 +81,27 @@ if chart_style == "Matplotlib":
         plt.tight_layout()
     st.pyplot(plt)
 elif chart_style == "Vega":
-    mape_chart = alt.Chart(mape_df).mark_line().encode(
-    x=alt.X('train_size',
-            axis=alt.Axis(title='Train size')
-            ),
-    y=alt.Y('mape',
-            axis=alt.Axis(title='MAPE'),
-            scale=alt.Scale(domain=(0, 1))
-            )
-    )
-    st.altair_chart(mape_chart, use_container_width=True)
+    bar = st.checkbox("Bar chart")
+    if bar:
+        mape_chart = alt.Chart(mape_df).mark_bar(size=50).encode(
+            x=alt.X('train_size',
+                axis=alt.Axis(title='Train size')
+                ),
+            y=alt.Y('mape',
+                axis=alt.Axis(title='MAPE'),
+                scale=alt.Scale(domain=(0, 1))
+                )
+        )
+        line = alt.Chart(avg_df).mark_rule(color="red").encode(y='y')
+        st.altair_chart(mape_chart + line, use_container_width=True)
+    else:
+        mape_chart = alt.Chart(mape_df).mark_line().encode(
+        x=alt.X('train_size',
+                axis=alt.Axis(title='Train size')
+                ),
+        y=alt.Y('mape',
+                axis=alt.Axis(title='MAPE'),
+                scale=alt.Scale(domain=(0, 1))
+                )
+        )
+        st.altair_chart(mape_chart, use_container_width=True)
