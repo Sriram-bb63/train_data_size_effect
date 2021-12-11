@@ -40,4 +40,23 @@ def mape_list_func():
 
 mape_lst = mape_list_func()
 
-st.write(mape_lst)
+df = pd.DataFrame(
+    {
+        "train_size": [i for i in range(10, 91, 10)],
+        "mape": mape_lst
+    }
+)
+
+chart_style = st.selectbox("Select type of chart", ("Matplotlib", "Vega"))
+
+if chart_style == "Matplotlib":
+    import matplotlib.pyplot as plt
+    plt.rcParams["figure.figsize"] = (10,5)
+    plt.plot(df["train_size"], df["mape"], label="MAPE")
+    plt.grid()
+    plt.ylim([0, 1])
+    plt.legend(loc="upper right")
+    plt.xlabel("Train size in %")
+    plt.ylabel("MAPE")
+    plt.tight_layout()
+    st.pyplot(plt)
