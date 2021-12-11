@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import altair as alt
 
 st.write("# Effect of train data size")
@@ -49,18 +48,30 @@ mape_df = pd.DataFrame(
     }
 )
 
-chart_style = st.selectbox("Select type of chart", ("Matplotlib", "Vega"))
+chart_style = st.selectbox("Chart type", ("Matplotlib", "Vega"))
 
 if chart_style == "Matplotlib":
     import matplotlib.pyplot as plt
-    plt.rcParams["figure.figsize"] = (10,5)
-    plt.plot(mape_df["train_size"], mape_df["mape"], label="MAPE")
-    plt.grid()
-    plt.ylim([0, 1])
-    plt.legend(loc="upper right")
-    plt.xlabel("Train size in %")
-    plt.ylabel("MAPE")
-    plt.tight_layout()
+    bar = st.checkbox("Bar chart")
+    if bar:
+        plt.bar(mape_df["train_size"], mape_df["mape"], width=7)
+        avg = sum(mape_df["mape"]) / len(mape_df["mape"])
+        plt.plot([0, 100], [avg, avg], color="red")
+        plt.ylim([0, 1])
+        plt.legend(loc="upper right")
+        plt.xlabel("Train size in %")
+        plt.ylabel("MAPE")
+        plt.grid(axis="y")
+        plt.tight_layout()
+    else:
+        plt.rcParams["figure.figsize"] = (10,5)
+        plt.plot(mape_df["train_size"], mape_df["mape"], label="MAPE", marker="o")
+        plt.grid()
+        plt.ylim([0, 1])
+        plt.legend(loc="upper right")
+        plt.xlabel("Train size in %")
+        plt.ylabel("MAPE")
+        plt.tight_layout()
     st.pyplot(plt)
 elif chart_style == "Vega":
     mape_chart = alt.Chart(mape_df).mark_line().encode(
