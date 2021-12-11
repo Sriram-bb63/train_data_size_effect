@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import altair as alt
 
 st.write("# Effect of train data size")
 
@@ -40,7 +42,7 @@ def mape_list_func():
 
 mape_lst = mape_list_func()
 
-df = pd.DataFrame(
+mape_df = pd.DataFrame(
     {
         "train_size": [i for i in range(10, 91, 10)],
         "mape": mape_lst
@@ -52,7 +54,7 @@ chart_style = st.selectbox("Select type of chart", ("Matplotlib", "Vega"))
 if chart_style == "Matplotlib":
     import matplotlib.pyplot as plt
     plt.rcParams["figure.figsize"] = (10,5)
-    plt.plot(df["train_size"], df["mape"], label="MAPE")
+    plt.plot(mape_df["train_size"], mape_df["mape"], label="MAPE")
     plt.grid()
     plt.ylim([0, 1])
     plt.legend(loc="upper right")
@@ -60,3 +62,14 @@ if chart_style == "Matplotlib":
     plt.ylabel("MAPE")
     plt.tight_layout()
     st.pyplot(plt)
+elif chart_style == "Vega":
+    mape_chart = alt.Chart(mape_df).mark_line().encode(
+    x=alt.X('train_size',
+            axis=alt.Axis(title='Train size')
+            ),
+    y=alt.Y('mape',
+            axis=alt.Axis(title='MAPE'),
+            scale=alt.Scale(domain=(0, 1))
+            )
+    )
+    st.altair_chart(mape_chart, use_container_width=True)
