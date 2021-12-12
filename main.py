@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 st.write("# Effect of train data size")
 
-@st.cache
+# @st.cache
 def get_data():
     df = pd.read_csv("fish.csv")
     return df
