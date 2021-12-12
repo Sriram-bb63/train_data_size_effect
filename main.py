@@ -5,9 +5,32 @@ import matplotlib.pyplot as plt
 
 st.write("# Effect of train data size")
 
-# @st.cache
+smol_docs = """
+## What is train size?
+
+The amount of data which is used to train a model is called as train size. Very less training data or too much training data will affect the model's accuracy negatively.
+
+## What is MAPE?
+
+The average error of the predictions made by the model in percentage is called MAPE(Mean Absolute Percentage Error).
+"""
+
+
+st.sidebar.write(smol_docs)
+
+st.sidebar.markdown("""---""")
+
+links = """
+Made by [Sriram Vasudevan](https://sriram-bb63.github.io/)
+
+Source code [Github](https://github.com/Sriram-bb63/train_data_size_effect)
+"""
+
+st.sidebar.write(links)
+
+@st.cache
 def get_data():
-    df = pd.read_csv("fish.csv")
+    df = pd.read_csv("Fish.csv")
     return df
 df = get_data()
 
@@ -80,7 +103,7 @@ elif chart_style == "Vega":
     if bar:
         mape_chart = alt.Chart(mape_df).mark_bar(size=50).encode(
             x=alt.X('train_size',
-                axis=alt.Axis(title='Train size')
+                axis=alt.Axis(title='Train size in %')
                 ),
             y=alt.Y('mape',
                 axis=alt.Axis(title='MAPE'),
@@ -92,7 +115,7 @@ elif chart_style == "Vega":
     else:
         mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
         x=alt.X('train_size',
-                axis=alt.Axis(title='Train size')
+                axis=alt.Axis(title='Train size in %')
                 ),
         y=alt.Y('mape',
                 axis=alt.Axis(title='MAPE'),
