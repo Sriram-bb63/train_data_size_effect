@@ -1,7 +1,7 @@
-from matplotlib.pyplot import sca
 import streamlit as st
 import pandas as pd
 import altair as alt
+import matplotlib.pyplot as plt
 
 st.write("# Effect of train data size")
 
@@ -11,14 +11,9 @@ def get_data():
     return df
 df = get_data()
 
-@st.cache
-def show_data_func():
-    df_to_display = df.iloc[:5]
-    return df_to_display
-
 show_data = st.checkbox("Show data")
 if show_data:
-    st.table(show_data_func())
+    st.dataframe(df)
 
 x = df[["Height", "Width", "Length"]]
 y = df["Weight"]
@@ -59,20 +54,20 @@ avg_df = pd.DataFrame(
 chart_style = st.selectbox("Chart type", ("Matplotlib", "Vega"))
 
 if chart_style == "Matplotlib":
-    import matplotlib.pyplot as plt
+    plt.rcParams["figure.figsize"] = (10,5)
     bar = st.checkbox("Bar chart")
     if bar:
         plt.bar(mape_df["train_size"], mape_df["mape"], width=7)
-        plt.plot([0, 100], [avg, avg], color="red")
+        plt.plot([5, 95], [avg, avg], color="red")
         plt.ylim([0, 1])
         plt.legend(loc="upper right")
         plt.xlabel("Train size in %")
         plt.ylabel("MAPE")
         plt.grid(axis="y")
         plt.tight_layout()
-    else:
-        plt.rcParams["figure.figsize"] = (10,5)
+    else:        
         plt.plot(mape_df["train_size"], mape_df["mape"], label="MAPE", marker="o")
+        plt.plot([10, 90], [avg, avg], color="red")
         plt.grid()
         plt.ylim([0, 1])
         plt.legend(loc="upper right")
@@ -95,7 +90,7 @@ elif chart_style == "Vega":
         line = alt.Chart(avg_df).mark_rule(color="red").encode(y='y')
         st.altair_chart(mape_chart + line, use_container_width=True)
     else:
-        mape_chart = alt.Chart(mape_df).mark_line().encode(
+        mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
         x=alt.X('train_size',
                 axis=alt.Axis(title='Train size')
                 ),
@@ -104,4 +99,5 @@ elif chart_style == "Vega":
                 scale=alt.Scale(domain=(0, 1))
                 )
         )
-        st.altair_chart(mape_chart, use_container_width=True)
+        line = alt.Chart(avg_df).mark_rule(color="red").encode(y='y')
+        st.altair_chart(mape_chart + line, use_container_width=True)
