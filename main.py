@@ -48,8 +48,6 @@ def trainer(models, mape_lst):
         model_mape_lst = []
         for train_size in range(10, 91, 10):
             train_x, test_x, train_y, test_y = train_test_split(x, y, random_state=1, train_size=train_size)
-            # m = 1       # Added to remove annoying yellow scribbles below
-            # exec(f"m = {model}()")
             model.fit(train_x, train_y)
             p = model.predict(test_x)
             mape = mean_absolute_percentage_error(p, test_y)
@@ -57,12 +55,14 @@ def trainer(models, mape_lst):
         mape_lst.append(model_mape_lst)
     return mape_lst
 
-mape_lst = []
+mape_lst = trainer(models, [])
 
-mape_lst = trainer(models, mape_lst)
+mape_df = pd.DataFrame()
 
-# for i in mape_lst:
-st.write(mape_lst)
+for i in range(len(mape_lst)):
+    mape_df[f"model_{i+1}"] = mape_lst[i]
+
+st.table(mape_df)
 
 # mape_df = pd.DataFrame(
 #     {
