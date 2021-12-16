@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import matplotlib.pyplot as plt
+plt.rcParams["figure.figsize"] = (10,5)
 
 st.write("# Effect of train data size")
 
@@ -22,29 +23,26 @@ y = df["Weight"]
 
 st.write("## Choose models")
 
-# linear_regression_checkbox = st.checkbox("Linear regression")
 decision_tree_checkbox = st.checkbox("Decision tree")
 random_forest_checkbox = st.checkbox("Random forest")
 
 from sklearn.linear_model import LinearRegression
 
-models = [LinearRegression()]
+models = {"Linear regression": LinearRegression()}
 
-# if linear_regression_checkbox:
-#     from sklearn.linear_model import LinearRegression
-#     models.append("LinearRegression")
 if decision_tree_checkbox:
     from sklearn.tree import DecisionTreeRegressor
-    models.append(DecisionTreeRegressor())
+    models["Decision tree"] = DecisionTreeRegressor()
 if random_forest_checkbox:
     from sklearn.linear_model import Ridge
-    models.append(Ridge())
+    models["Ridge"] = Ridge()
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_percentage_error
 
-def trainer(models, mape_lst):
-    for model in models:
+def trainer(models):
+    for i in models.keys():
+        model = models[i]
         model_mape_lst = []
         for train_size in range(10, 91, 10):
             train_x, test_x, train_y, test_y = train_test_split(x, y, random_state=1, train_size=train_size)
@@ -52,35 +50,56 @@ def trainer(models, mape_lst):
             p = model.predict(test_x)
             mape = mean_absolute_percentage_error(p, test_y)
             model_mape_lst.append(mape)
-        mape_lst.append(model_mape_lst)
-    return mape_lst
+        models[i] = model_mape_lst
+    return models
 
-mape_lst = trainer(models, [])
+mape_dict = trainer(models)
+
+mape_dict
 
 mape_df = pd.DataFrame()
 
-for i in range(len(mape_lst)):
-    mape_df[f"model_{i+1}"] = mape_lst[i]
+mape_df["Linear regression"] = mape_dict[0]
+if decision_tree_checkbox:
+    mape_df["Decision tree"] = mape_dict[1]
+if random_forest_checkbox:
+    mape_df["Random forest"] = mape_dict[-1]
 
-st.table(mape_df)
+st.write("---")
 
-# mape_df = pd.DataFrame(
-#     {
-#         "train_size": [i for i in range(10, 91, 10)],
-#         "mape": mape_lst
-#     }
-# )
+show_mape_data = st.checkbox("MAPE df")
 
-# avg = sum(mape_df["mape"]) / len(mape_df["mape"])
-# avg_df = pd.DataFrame(
-#     {
-#         'y': [avg]
-#     }
-# )
+if show_mape_data:
+    st.table(mape_df)
 
-# chart_style = st.selectbox("Chart type", ("Matplotlib", "Vega"))
+chart_style = st.selectbox("Chart style", ("Matplotlib", "Vega"))
 
-# bar = st.checkbox("Bar chart")
+if chart_style == "Matplotlib":
+    for i in range(len(mape_dict)):
+        plt.plot(mape_df.index, mape_df[f"model_{i+1}"], marker=".")
+    plt.ylim([0, 1])
+    plt.xlabel("Train size in %")
+    plt.ylabel("MAPE")
+    plt.grid()
+    plt.tight_layout()
+    st.pyplot(plt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # if chart_style == "Matplotlib":
 #     plt.rcParams["figure.figsize"] = (10,5)
@@ -93,16 +112,6 @@ st.table(mape_df)
 #         plt.ylabel("MAPE")
 #         plt.grid(axis="y")
 #         plt.tight_layout()
-#     else:        
-#         plt.plot(mape_df["train_size"], mape_df["mape"], label="MAPE", marker="o")
-#         plt.plot([10, 90], [avg, avg], color="red")
-#         plt.grid()
-#         plt.ylim([0, 1])
-#         plt.legend(loc="upper right")
-#         plt.xlabel("Train size in %")
-#         plt.ylabel("MAPE")
-#         plt.tight_layout()
-#     st.pyplot(plt)
 # elif chart_style == "Vega":
 #     if bar:
 #         mape_chart = alt.Chart(mape_df).mark_bar(size=50).encode(
@@ -151,3 +160,25 @@ Source code [Github](https://github.com/Sriram-bb63/train_data_size_effect)
 """
 
 st.sidebar.write(links)
+
+
+
+
+
+
+
+
+
+
+
+# def trainer(models, mape_lst):
+#     for model in models:
+#         model_mape_lst = []
+#         for train_size in range(10, 91, 10):
+#             train_x, test_x, train_y, test_y = train_test_split(x, y, random_state=1, train_size=train_size)
+#             model.fit(train_x, train_y)
+#             p = model.predict(test_x)
+#             mape = mean_absolute_percentage_error(p, test_y)
+#             model_mape_lst.append(mape)
+#         mape_lst.append(model_mape_lst)
+#     return mape_lst
