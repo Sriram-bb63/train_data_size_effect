@@ -21,10 +21,12 @@ if show_data:
 x = df[["Height", "Width", "Length"]]
 y = df["Weight"]
 
+st.write("---")
+
 st.write("## Choose models")
 
 decision_tree_checkbox = st.checkbox("Decision tree")
-random_forest_checkbox = st.checkbox("Random forest")
+random_forest_checkbox = st.checkbox("Ridge")
 
 from sklearn.linear_model import LinearRegression
 
@@ -55,15 +57,13 @@ def trainer(models):
 
 mape_dict = trainer(models)
 
-mape_dict
-
 mape_df = pd.DataFrame()
 
-mape_df["Linear regression"] = mape_dict[0]
+mape_df["Linear regression"] = mape_dict["Linear regression"]
 if decision_tree_checkbox:
-    mape_df["Decision tree"] = mape_dict[1]
+    mape_df["Decision tree"] = mape_dict["Decision tree"]
 if random_forest_checkbox:
-    mape_df["Random forest"] = mape_dict[-1]
+    mape_df["Ridge"] = mape_dict["Ridge"]
 
 st.write("---")
 
