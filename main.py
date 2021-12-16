@@ -75,16 +75,30 @@ if show_mape_data:
 
 chart_style = st.selectbox("Chart style", ("Matplotlib", "Vega"))
 
-if chart_style == "Matplotlib":
+average_checkbox = st.checkbox("Average MAPE")
+
+if average_checkbox:
+    avg_fig, ax = plt.subplots()
+    avg_mape_dict = dict()
     for col in mape_df.columns:
-        plt.plot(mape_df.index*10, mape_df[col], marker=".", label=col)
-    plt.legend(loc="upper right")
-    plt.grid()
+        avg_mape = sum(mape_df[col]) / len(mape_df[col])
+        avg_mape_dict[col] = avg_mape
+    ax.bar(avg_mape_dict.keys(), avg_mape_dict.values())
+    st.pyplot(avg_fig)
+
+
+if chart_style == "Matplotlib":
+    mape_fig, ax = plt.subplots()
+    for col in mape_df.columns:
+        ax.plot(mape_df.index*10, mape_df[col], marker=".", label=col)
+    ax.legend(loc="upper right")
+    ax.grid()
     plt.tight_layout()
-    plt.xlabel("Train data size in %")
-    plt.ylabel("MAPE")
-    plt.ylim([0, 2])
-    st.pyplot(plt)
+    ax.set_xlabel("Train data size in %")
+    ax.set_ylabel("MAPE")
+    ax.set_ylim([0, 2])
+    plt.style.use("seaborn")
+    st.pyplot(mape_fig)
 
 
 
