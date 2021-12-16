@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import matplotlib.pyplot as plt
+from streamlit.elements.map import _DEFAULT_MAP
 plt.rcParams["figure.figsize"] = (10,5)
 
 st.write("# Effect of train data size")
@@ -75,13 +76,14 @@ if show_mape_data:
 chart_style = st.selectbox("Chart style", ("Matplotlib", "Vega"))
 
 if chart_style == "Matplotlib":
-    for i in range(len(mape_dict)):
-        plt.plot(mape_df.index, mape_df[f"model_{i+1}"], marker=".")
-    plt.ylim([0, 1])
-    plt.xlabel("Train size in %")
-    plt.ylabel("MAPE")
+    for col in mape_df.columns:
+        plt.plot(mape_df.index*10, mape_df[col], marker=".", label=col)
+    plt.legend(loc="upper right")
     plt.grid()
     plt.tight_layout()
+    plt.xlabel("Train data size in %")
+    plt.ylabel("MAPE")
+    plt.ylim([0, 2])
     st.pyplot(plt)
 
 
