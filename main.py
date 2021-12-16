@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import matplotlib.pyplot as plt
-from streamlit.elements.map import _DEFAULT_MAP
+plt.style.use("seaborn")
+plt.tight_layout()
 plt.rcParams["figure.figsize"] = (10,5)
 
 st.write("# Effect of train data size")
@@ -60,6 +61,8 @@ mape_dict = trainer(models)
 
 mape_df = pd.DataFrame()
 
+mape_df["Train data size"] = [i for i in range(10, 91, 10)]
+
 mape_df["Linear regression"] = mape_dict["Linear regression"]
 if decision_tree_checkbox:
     mape_df["Decision tree"] = mape_dict["Decision tree"]
@@ -75,31 +78,49 @@ if show_mape_data:
 
 chart_style = st.selectbox("Chart style", ("Matplotlib", "Vega"))
 
-average_checkbox = st.checkbox("Average MAPE")
-
-if average_checkbox:
-    avg_fig, ax = plt.subplots()
-    avg_mape_dict = dict()
-    for col in mape_df.columns:
-        avg_mape = sum(mape_df[col]) / len(mape_df[col])
-        avg_mape_dict[col] = avg_mape
-    ax.bar(avg_mape_dict.keys(), avg_mape_dict.values())
-    st.pyplot(avg_fig)
-
-
 if chart_style == "Matplotlib":
     mape_fig, ax = plt.subplots()
     for col in mape_df.columns:
         ax.plot(mape_df.index*10, mape_df[col], marker=".", label=col)
     ax.legend(loc="upper right")
-    ax.grid()
-    plt.tight_layout()
     ax.set_xlabel("Train data size in %")
     ax.set_ylabel("MAPE")
     ax.set_ylim([0, 2])
-    plt.style.use("seaborn")
     st.pyplot(mape_fig)
+    average_checkbox = st.checkbox("Average MAPE")
 
+    if average_checkbox:
+        avg_fig, ax = plt.subplots()
+        avg_mape_dict = dict()
+        for col in mape_df.columns:
+            avg_mape = sum(mape_df[col]) / len(mape_df[col])
+            avg_mape_dict[col] = avg_mape
+        ax.bar(avg_mape_dict.keys(), avg_mape_dict.values())
+        st.pyplot(avg_fig)
+
+elif chart_style == "Vega":
+    mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
+        x=alt.X('Train data size',
+                axis=alt.Axis(title='Train size in %')
+            ),
+            y=alt.Y("Linear regression",
+                    axis=alt.Axis(title='MAPE'),
+                    scale=alt.Scale(domain=(0, 1))
+            )
+        )
+    for col in mape_df.iloc[:, 2:]:
+        mape_chart_temp = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
+            x=alt.X('Train data size',
+                    axis=alt.Axis(title='Train size in %')
+                ),
+            y=alt.Y(col,
+                    axis=alt.Axis(title='MAPE'),
+                    scale=alt.Scale(domain=(0, 1))
+                )
+            )
+        mape_chart = mape_chart + mape_chart_temp
+    st.altair_chart(mape_chart, use_container_width=True)
+    
 
 
 
