@@ -1,13 +1,12 @@
 import streamlit as st
 import pandas as pd
-# import altair as alt
 import matplotlib.pyplot as plt
+
 plt.style.use("seaborn")
 plt.tight_layout()
 plt.rcParams["figure.figsize"] = (10,5)
 
 st.write("# Effect of train data size")
-
 st.write("---")
 
 @st.cache
@@ -24,14 +23,11 @@ x = df[["Height", "Width", "Length"]]
 y = df["Weight"]
 
 st.write("---")
-
 st.write("## Choose models")
-
 decision_tree_checkbox = st.checkbox("Decision tree")
 ridge_checkbox = st.checkbox("Ridge")
 
 from sklearn.linear_model import LinearRegression
-
 models = {"Linear regression": LinearRegression()}
 
 if decision_tree_checkbox:
@@ -70,7 +66,6 @@ if ridge_checkbox:
     mape_df["Ridge"] = mape_dict["Ridge"]
 
 st.write("---")
-
 show_mape_data = st.checkbox("MAPE df")
 
 if show_mape_data:
@@ -87,8 +82,8 @@ if chart_style == "Matplotlib":
     ax.set_ylabel("MAPE")
     ax.set_ylim([0, 2])
     st.pyplot(mape_fig)
-    average_checkbox = st.checkbox("Average MAPE")
 
+    average_checkbox = st.checkbox("Average MAPE")
     if average_checkbox:
         avg_fig, ax = plt.subplots()
         avg_mape_dict = dict()
@@ -99,39 +94,6 @@ if chart_style == "Matplotlib":
         st.pyplot(avg_fig)
 
 elif chart_style == "Vega":
-    # mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-    #     x=alt.X('Train data size',
-    #             axis=alt.Axis(title='Train size in %')
-    #         ),
-    #     y=alt.Y("Linear regression",
-    #             axis=alt.Axis(title='MAPE'),
-    #             scale=alt.Scale(domain=(0, 1))
-    #         ),
-    #     color=alt.value("#5072aa")
-    # )
-    # if decision_tree_checkbox:
-    #     mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-    #         x=alt.X('Train data size',
-    #                 axis=alt.Axis(title='Train size in %')
-    #             ),
-    #         y=alt.Y("Decision tree",
-    #                 axis=alt.Axis(title='MAPE'),
-    #                 scale=alt.Scale(domain=(0, 1))
-    #             ),
-    #         color=alt.value("#57a76a")
-    #     )
-    # if ridge_checkbox:
-    #     mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-    #         x=alt.X('Train data size',
-    #                 axis=alt.Axis(title='Train size in %')
-    #             ),
-    #         y=alt.Y("Ridge",
-    #                 axis=alt.Axis(title='MAPE'),
-    #                 scale=alt.Scale(domain=(0, 1))
-    #             ),
-    #         color=alt.value("#bd555a")
-    #     )
-    # st.altair_chart(mape_chart, use_container_width=True)
     st.line_chart(mape_df.iloc[:, 1:], use_container_width=True)
 
 
@@ -144,7 +106,6 @@ The amount of data which is used to train a model is called as train size. Very 
 
 The average error of the predictions made by the model in percentage is called MAPE(Mean Absolute Percentage Error).
 """
-
 
 st.sidebar.write(smol_docs)
 
