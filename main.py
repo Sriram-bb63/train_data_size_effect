@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
+# import altair as alt
 import matplotlib.pyplot as plt
 plt.style.use("seaborn")
 plt.tight_layout()
@@ -99,39 +99,40 @@ if chart_style == "Matplotlib":
         st.pyplot(avg_fig)
 
 elif chart_style == "Vega":
-    mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-        x=alt.X('Train data size',
-                axis=alt.Axis(title='Train size in %')
-            ),
-        y=alt.Y("Linear regression",
-                axis=alt.Axis(title='MAPE'),
-                scale=alt.Scale(domain=(0, 1))
-            ),
-        color=alt.value("#5072aa")
-    )
-    if decision_tree_checkbox:
-        mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-            x=alt.X('Train data size',
-                    axis=alt.Axis(title='Train size in %')
-                ),
-            y=alt.Y("Decision tree",
-                    axis=alt.Axis(title='MAPE'),
-                    scale=alt.Scale(domain=(0, 1))
-                ),
-            color=alt.value("#57a76a")
-        )
-    if ridge_checkbox:
-        mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
-            x=alt.X('Train data size',
-                    axis=alt.Axis(title='Train size in %')
-                ),
-            y=alt.Y("Ridge",
-                    axis=alt.Axis(title='MAPE'),
-                    scale=alt.Scale(domain=(0, 1))
-                ),
-            color=alt.value("#bd555a")
-        )
-    st.altair_chart(mape_chart, use_container_width=True)
+    # mape_chart = alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
+    #     x=alt.X('Train data size',
+    #             axis=alt.Axis(title='Train size in %')
+    #         ),
+    #     y=alt.Y("Linear regression",
+    #             axis=alt.Axis(title='MAPE'),
+    #             scale=alt.Scale(domain=(0, 1))
+    #         ),
+    #     color=alt.value("#5072aa")
+    # )
+    # if decision_tree_checkbox:
+    #     mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
+    #         x=alt.X('Train data size',
+    #                 axis=alt.Axis(title='Train size in %')
+    #             ),
+    #         y=alt.Y("Decision tree",
+    #                 axis=alt.Axis(title='MAPE'),
+    #                 scale=alt.Scale(domain=(0, 1))
+    #             ),
+    #         color=alt.value("#57a76a")
+    #     )
+    # if ridge_checkbox:
+    #     mape_chart += alt.Chart(mape_df).mark_line(point=alt.OverlayMarkDef()).encode(
+    #         x=alt.X('Train data size',
+    #                 axis=alt.Axis(title='Train size in %')
+    #             ),
+    #         y=alt.Y("Ridge",
+    #                 axis=alt.Axis(title='MAPE'),
+    #                 scale=alt.Scale(domain=(0, 1))
+    #             ),
+    #         color=alt.value("#bd555a")
+    #     )
+    # st.altair_chart(mape_chart, use_container_width=True)
+    st.line_chart(mape_df.iloc[:, 1:], use_container_width=True)
 
 
 smol_docs = """
